@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html ng-app="xngreorderApp">
+    <head>
+        <style>
+        </style>
+    </head>
+    <body>
+        <div >
+            <div ng-controller="xngreorderController">
+                <div ng-repeat="video in videos">
+                    <reorder style="" last="{{$last}}" array="videos" reorder>
+                        <table>
+                            <tr >
+                                <td width="48" height="48" ng-style="video.style">
+                                    <span >&nbsp;</span>
+                                </td>
+                                <td>
+                                    <span><b>{{video.name}}</b></span><br/>
+                                    <span><i style="color: #888;font-size: x-small;"> ({{video.band}})</i></span>
+                                </td>
+                            </tr>
+                        </table>
+                    </reorder>
+                </div>
+            </div>
+        </div>
+        <script src="angular-1.1.0.min.js"></script>
+        <script src="xng-reorder.js"></script>
+        <script src="xng-reorderApp.js"></script>
+    </body>
+</html>
