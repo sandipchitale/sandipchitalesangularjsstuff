@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en"	ng-app="NGJSODApp">
+	<head>
+		<title>JSOD</title>
+		<link rel="stylesheet" type="text/css" href="css/jquery.svg.css">
+		<script>
+			function Person(name) {
+			        this.name = name;
+			}
+
+			Person.prototype.getName = function() {
+			        return this.name;
+			}
+
+			function Employee(name, salary) {
+			        if (arguments.callee.prototype.__proto__ === Object.prototype) {
+			                arguments.callee.prototype.__proto__ = Person.prototype;
+			                arguments.callee.prototype.getSalary = function() {
+			                        return this.salary;
+			                }
+			        }
+			        arguments.callee.prototype.__proto__.constructor.call(this, name);
+			        this.salary = salary;
+			}
+
+			function Executive(name, salary, bonus) {
+			        if (arguments.callee.prototype.__proto__ === Object.prototype) {
+			                arguments.callee.prototype.__proto__ = Employee.prototype;
+			                arguments.callee.prototype.getBonus = function() {
+			                        return this.bonus;
+			                }
+			        }
+			        arguments.callee.prototype.__proto__.constructor.call(this, name, salary);
+			        this.bonus = bonus;
+			}
+
+			var hotshot = new Executive('Hotshot', 400000, 100000);
+			var workerbee = new Employee('Workerbee', 100000);
+
+		</script>
+	</head>
+	<body>
+		<div ng-controller="NGJSODController">
+			Show object diagram of <input ng-model="data.objectName" cols="40" />
+			<span style="color: #CCCCCC"> 'hotshot' is from <a target="_blank" href="http://sandipchitale.blogspot.com/2014/03/enhanced-simple-javascript-inheritance.html">this</a> example. </span>
+			&nbsp;&nbsp;<a href="https://github.com/sandipchitale/ngjsod"><img src="icons/github.gif" alt="GitHub"/></a>
+			<div ng-jsod object-name="{{data.objectName}}"></div>
+		</div>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="http://code.angularjs.org/1.2.1/angular.min.js"></script>
+		<script type="text/javascript" src="js/jquery.svg.js"></script>
+		<script src="js/ngjsod.js"></script>
+		<script src="js/ngjsodapp.js"></script>
+	</body>
+</html>
