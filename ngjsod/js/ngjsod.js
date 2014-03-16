@@ -38,12 +38,15 @@
             y += boxHeight;
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray', fill: 'ivory'});
             svg.text(g, x+20, y+16, (value.constructor.name || '') + ' constructor', {fill: 'lightGray'});
-            svg.line(g, x+boxWidth, y+12, x+(3*boxWidth), y+12,  {stroke: 'lightGray', markerEnd: 'url(#arrow)'});
+            var cfr = svg.line(g, x+boxWidth, y+12, x+(3*boxWidth), y+12,  {stroke: 'lightGray', markerEnd: 'url(#arrow)'});
+            svg.title(cfr, 'Inherited constructor property - reference to Constructor function.');
+
             y += boxHeight;
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'black'});
             svg.image(g, x+2, y+4, 16, 16, 'icons/object.png');
             svg.text(g, x+20, y+16, '__proto__', {fill: 'black'});
-            svg.line(g, x+boxWidth, y+12, x+(boxWidth+(boxWidth/4)), y+12,  {stroke: 'black', markerEnd: 'url(#arrow)'});
+            var pr = svg.line(g, x+boxWidth, y+12, x+(boxWidth+(boxWidth/4)), y+12,  {stroke: 'black', markerEnd: 'url(#arrow)'});
+            svg.title(pr, 'Hidden reference to prototype object.');
 
             var props = [];
             for(var prop in value) {
@@ -122,20 +125,26 @@
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray', strokeWidth: '1'});
             svg.image(g, x+2, y+4, 16, 16, 'icons/object.png');
             svg.text(g, x+20, y+16, (value.__proto__ && value.__proto__.__proto__ && value.__proto__.__proto__.constructor.name) + ' {}', {fill: 'black'});
-            svg.line(g, x+(boxWidth+(boxWidth/4)), y+12, x+boxWidth, y+12, {stroke: 'black', markerEnd: 'url(#arrow)'});
+            var c2pr = svg.line(g, x+(boxWidth+(boxWidth/4)), y+12, x+boxWidth, y+12, {stroke: 'black', markerEnd: 'url(#arrow)'});
+            svg.title(c2pr, 'Reference to prototype object from Constructor function.');
+
             y += boxHeight;
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray'});
             svg.image(g, x+2, y+4, 16, 16, 'icons/function.png');
             svg.text(g, x+20, y+16, 'constructor', {fill: 'black'});
-            svg.line(g, x+boxWidth, y+12, x+(boxWidth+(boxWidth/8)), y+12,  {stroke: 'black'});
-            svg.line(g, x+(boxWidth+(boxWidth/8)), y+12, x+(boxWidth+(boxWidth/8)), y-(boxHeight+(boxHeight/2)),  {stroke: 'black'});
-            svg.line(g, x+(boxWidth+(boxWidth/8)), y-(boxHeight+(boxHeight/2)), x+(boxWidth+(boxWidth/4)), y-(boxHeight+(boxHeight/2)), {stroke: 'black', markerEnd: 'url(#arrow)'});
+            var p2cr = svg.line(g, x+boxWidth, y+12, x+(boxWidth+(boxWidth/8)), y+12,  {stroke: 'black'});
+            svg.title(p2cr, 'Reference to Constructor function.');
+            p2cr = svg.line(g, x+(boxWidth+(boxWidth/8)), y+12, x+(boxWidth+(boxWidth/8)), y-(boxHeight+(boxHeight/2)),  {stroke: 'black'});
+            svg.title(p2cr, 'Reference to Constructor function.');
+            p2cr = svg.line(g, x+(boxWidth+(boxWidth/8)), y-(boxHeight+(boxHeight/2)), x+(boxWidth+(boxWidth/4)), y-(boxHeight+(boxHeight/2)), {stroke: 'black', markerEnd: 'url(#arrow)'});
+            svg.title(p2cr, 'Reference to Constructor function.');
             y += boxHeight;
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray'});
             svg.image(g, x+2, y+4, 16, 16, 'icons/object.png');
             svg.text(g, x+20, y+16, '__proto__', {fill: 'black'});
             if (value.__proto__) {
-                svg.line(g, x+boxWidth, y+12, x+(boxWidth*2.25), y+12,  {stroke: 'black'});
+                var ppr = svg.line(g, x+boxWidth, y+12, x+(boxWidth*2.25), y+12,  {stroke: 'black'});
+                svg.title(ppr, 'Hidden reference to prototype object.');
             }
 
             var props = [];
