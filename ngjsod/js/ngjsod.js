@@ -238,13 +238,19 @@
 
         }
 
-        var toolbar = angular.element('<div style="display:block; text-align: center;"></div>');
+        var toolbar = angular.element('<div style="text-align: center;"></div>');
+
         var zoomOutButton = angular.element('<button style="vertical-align: middle;">&#xFF0D;</button>');
         var zoomRange = angular.element('<input style="vertical-align: middle;"type="range" min="-3" max="3"/>');
         var zoomInButton = angular.element('<button style="vertical-align: middle;">&#xff0b;</button>');
+        var panWestButton = angular.element('<button style="vertical-align: middle;">&#x25c2;</button>');
+        var panEastButton = angular.element('<button style="vertical-align: middle;">&#x25b8;</button>');
+
         toolbar.append(zoomOutButton);
         toolbar.append(zoomRange);
         toolbar.append(zoomInButton);
+        toolbar.append(panWestButton);
+        toolbar.append(panEastButton);
 
         var svgContainer = angular.element('<div></div>');
         return {
@@ -258,11 +264,18 @@
                 elem.append(toolbar);
                 elem.append(svgContainer);
                 svgContainer.svg(function(svg) {
+
+                    var zoomlevel = 1.0;
+                    var ox = 0;
+                    var oy = 0;
+                    var panzoom = function() {
+                        $(svg.root().childNodes[1]).animate({svgTransform:'translate(' + ox + ',' + oy + ') scale(' + zoomlevel + ')'}, 0);
+                    }
+
                     var zoomPercents = [0.25, 0.50, 0.75, 1.00, 1.25, 1.5, 2.00];
                     var zoom = function(level) {
-                        level = parseInt(level);
-                        var root = svg.root();
-                        $(root.childNodes[1]).animate({svgTransform:'scale(' + (zoomPercents[level+3]) + ')'}, 500);
+                        zoomlevel = zoomPercents[parseInt(level)+3];
+                        panzoom();
                     }
 
                     var zoomIn = function() {
@@ -291,9 +304,25 @@
                         zoom(zoomRange[0].value);
                     }
 
+                    var pan = function(dx, dy) {
+                        ox += dx;
+                        oy += dy;
+                        panzoom();
+                    }
+
+                    var panWest = function() {
+                        pan(+100, 0);
+                    }
+
+                    var panEast = function() {
+                        pan(-100, 0);
+                    }
+
                     zoomInButton.on('click', zoomIn);
                     zoomRange.on('change', zoomTo);
                     zoomOutButton.on('click', zoomOut);
+                    panWestButton.on('click', panWest);
+                    panEastButton.on('click', panEast);
 
 
                     var defs = svg.defs(null, "jsoddefs")
@@ -307,6 +336,10 @@
                     drawGraph(svg, g, scope.objectName);
                     scope.$watch('objectName', function() {
                         $(g).empty();
+                        zoomlevel = 1.0;
+                        ox = 0;
+                        oy = 0;
+                        panzoom();
                         try {
                             if (eval(scope.objectName)) {
                                 drawGraph(svg, g, scope.objectName);
