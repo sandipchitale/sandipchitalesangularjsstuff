@@ -7,7 +7,11 @@
             var y = 40;
             drawJavascriptObject(svg, gr, objectName, value, x, y);
             value = value.constructor.prototype.__proto__;
-            x += 1200;
+            if (!value.hasOwnProperty('constructor')) {
+                x += 1200;
+            } else {
+                x += 800;
+            }
             y += 96;
             while (value) {
                 drawJavascriptObject(svg, gr, '{}', value, x, y);
