@@ -3,24 +3,20 @@
     .directive('ngJsod', function() {
         function drawGraph(svg, gr, objectName) {
             var value = eval(objectName);
-            var x = 40;
-            var y = 40;
-            drawJavascriptObject(svg, gr, objectName, value, x, y);
-            value = value.constructor.prototype.__proto__;
-            x += 1200;
-            y += 96;
-            while (value) {
-                drawJavascriptObject(svg, gr, '{}', value, x, y);
-                value = value.constructor.prototype.__proto__;
-                if (value == null) {
-                    break;
-                }
-                if (!value.hasOwnProperty('constructor')) {
-                    x += 1200;
-                } else {
-                    x += 800;
-                }
-                y += 96;
+
+            if (value) {
+                var x = 40;
+                var y = 40;
+                do {
+                    drawJavascriptObject(svg, gr, '{}', value, x, y);
+                    if (value.hasOwnProperty('constructor')) {
+                        x += 800;
+                    } else {
+                        x += 1200;
+                    }
+                    y += 96;
+                    value = value.constructor.prototype.__proto__;
+                } while (value);
             }
         }
 
