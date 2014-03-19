@@ -1,51 +1,59 @@
 (function() {
     angular.module('NGJSOD', [])
     .directive('ngJsod', function() {
-        function drawGraph(svg, gr, objectName) {
-            var value = eval(objectName);
-
-            if (value) {
-                var x = 40;
-                var y = 40;
+        function drawGraph(svg, gr, expression) {
+            var value = eval(expression);
+            if (angular.isDefined(value)) {
+                var boxWidth = 320;
+                var boxHeight = 24;
+                var x = boxWidth/4;
+                var y = boxHeight;
+                // Initially just use the passed in name as label
+                var label = expression;
                 do {
-                    drawJavascriptObject(svg, gr, '{}', value, x, y);
+                    drawJavascriptObject(svg, gr, label, value, x, y, boxWidth, boxHeight);
                     if (value.hasOwnProperty('constructor')) {
                         x += 800;
                     } else {
                         x += 1200;
                     }
                     y += 96;
+                    label = '{}';
                     value = value.constructor.prototype.__proto__;
                 } while (value);
             }
         }
 
-        function drawJavascriptObject(svg, gr, label, value, ox, oy) {
-            // Simple jQuery SVG Text examples
-            var boxHeight = 24;
-            var boxWidth = 320;
+        function drawJavascriptObject(svg, gr, label, value, ox, oy, boxWidth, boxHeight) {
+
             var g = svg.group(gr, 'g', {fontFamily: 'Courier', fontSize: '12'});
 
             var x = ox;
             var y = oy;
 
+
+            // Normal object i.e. not a prototype like
+            // i.e. does not have constructor as it's own property
             if (!value.hasOwnProperty('constructor')) {
 
                 svg.line(g, x-(boxWidth/4), y+12, x, y+12,  {stroke: 'black', markerEnd: 'url(#arrow)'});
                 svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'black', strokeWidth: '1'});
+
                 if (angular.isArray(value)) {
                     svg.text(g, x+5, y+16, '[]', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
+                    svg.text(g, x+20, y+16, label + ' : []', {fill: 'black'});
                 } else if (angular.isFunction(value)) {
                     svg.text(g, x+5, y+16, 'fx', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
+                    svg.text(g, x+20, y+16, label + ' : ' + (value.name), {fill: 'black'});
                 } else {
                     svg.text(g, x+7, y+16, 'o', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
+                    svg.text(g, x+20, y+16, label + ' : ' + (value.constructor && value.constructor.name), {fill: 'black'});
                 }
-                svg.text(g, x+20, y+16, (value.constructor && value.constructor.name) + ' ' +label, {fill: 'black'});
 
                 y += boxHeight;
                 svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray', fill: 'ivory'});
                 svg.text(g, x+5, y+16, 'fx', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
-                svg.text(g, x+20, y+16, (value.constructor.name || '') + ' constructor', {fill: 'lightGray'});
+                svg.text(g, x+20, y+16, 'constructor : ' + (value.constructor.name || ''), {fill: 'lightGray'});
                 var cfr = svg.line(g, x+boxWidth, y+12, x+(3*boxWidth), y+12,  {stroke: 'lightGray', markerEnd: 'url(#arrow)'});
                 svg.title(cfr, 'Inherited constructor property - reference to Constructor function.');
 
@@ -56,6 +64,7 @@
                 var pr = svg.line(g, x+boxWidth, y+12, x+(boxWidth+(boxWidth/4)), y+12,  {stroke: 'black', markerEnd: 'url(#arrow)'});
                 svg.title(pr, 'Hidden reference to prototype object.');
 
+                // Properties of normal object
                 var props = [];
                 var tooltip;
 
@@ -143,14 +152,15 @@
             }
 
             if (value.hasOwnProperty('constructor')) {
+                var tp = svg.line(g, x-(boxWidth/4), y+12-(2*boxHeight), x-(boxWidth/8), y+12-(2*boxHeight), {stroke: 'black'});
                 var tp = svg.line(g, x-(boxWidth/8), y+12-(2*boxHeight), x, y+12,  {stroke: 'black', markerEnd: 'url(#arrow)'});
             }
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray', strokeWidth: '1'});
             svg.text(g, x+6, y+15, 'o', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
             if (value.hasOwnProperty('constructor')) {
-                svg.text(g, x+20, y+16, (value.constructor.name) + ' {}', {fill: 'black'});
+                svg.text(g, x+20, y+16, '{} : ' + (value.constructor.name), {fill: 'black'});
             } else {
-                svg.text(g, x+20, y+16, (value.__proto__ && value.__proto__.constructor.name) + ' {}', {fill: 'black'});
+                svg.text(g, x+20, y+16, '{} : ' + (value.__proto__ && value.__proto__.constructor.name), {fill: 'black'});
             }
             var c2pr = svg.line(g, x+(boxWidth+(boxWidth/4)), y+12, x+boxWidth, y+12, {stroke: 'black', markerEnd: 'url(#arrow)'});
             svg.title(c2pr, 'Reference to prototype object from Constructor function.');
@@ -227,7 +237,7 @@
                 } else {
                     text = text.substring(0, text.indexOf(' : '));
                 }
-                var rect = svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'black', strokeWidth: '1'});
+                var rect = svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'gray', strokeWidth: '1'});
                 svg.title(rect, tooltip);
                 svg.text(g, x+20, y+16, text, {fill: 'black'});
 
@@ -257,8 +267,13 @@
                 x = ox+boxWidth+boxWidth/4;
                 y = oy;
             }
-            // svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'lightGray'});
-            // svg.text(g, x+20, y+16, 'constructor', {fill: 'lightGray'});
+
+            y += boxHeight;
+            y -= boxHeight;
+            svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'lightGray'});
+            svg.text(g, x+7, y+16, 'o', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
+            svg.text(g, x+20, y+16, '__proto__', {fill: 'lightGray'});
+
             y += boxHeight;
             svg.rect(g, x, y, boxWidth, boxHeight,  {fill: 'white', stroke: 'lightGray'});
             svg.text(g, x+5, y+16, 'fx', {fill: 'black', fontSize: '9', fontWeight: 'bold'});
@@ -365,7 +380,7 @@
         return {
             restrict : 'AE',
             scope: {
-                objectName: '@'
+                expression: '@'
             },
             template : '<div style="border: 1px solid gray; overflow: auto; text-align: center;"></div>',
             replace : true,
@@ -442,17 +457,15 @@
                     var g = svg.group(
                         {fontFamily: 'Courier', fontSize: '12'}
                     )
-                    drawGraph(svg, g, scope.objectName);
-                    scope.$watch('objectName', function() {
+                    drawGraph(svg, g, scope.expression);
+                    scope.$watch('expression', function() {
                         $(g).empty();
                         zoomlevel = 1.0;
                         ox = 0;
                         oy = 0;
                         panzoom();
                         try {
-                            if (eval(scope.objectName)) {
-                                drawGraph(svg, g, scope.objectName);
-                            }
+                            drawGraph(svg, g, scope.expression);
                         } catch (e) {
                         }
                     });
