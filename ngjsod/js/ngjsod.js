@@ -365,7 +365,7 @@
         var toolbar = angular.element('<div style="text-align: center;"></div>');
 
         var zoomOutButton = angular.element('<button style="vertical-align: middle;">&#xFF0D;</button>');
-        var zoomRange = angular.element('<input style="vertical-align: middle;"type="range" min="-3" max="3"/>');
+        var zoomRange = angular.element('<input style="vertical-align: middle; "type="range" min="-3" max="3"/>');
         var zoomInButton = angular.element('<button style="vertical-align: middle;">&#xff0b;</button>');
         var panWestButton = angular.element('<button style="vertical-align: middle;">&#x25c2;</button>');
         var panEastButton = angular.element('<button style="vertical-align: middle;">&#x25b8;</button>');
