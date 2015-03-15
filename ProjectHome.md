@@ -1,0 +1,1 @@
+This project contains angularjs related stuff developed by me.
